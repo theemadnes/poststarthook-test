@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-hello-world
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: flask-hello-world
+  template:
+    metadata:
+      labels:
+        app: flask-hello-world
+        version: v1
+    spec:
+      #serviceAccountName: flask-hello-world-ksa
+      containers:
+      - name: flask-hello-world
+        image: us-central1-docker.pkg.dev/mci-asm-mcp/quickstart-docker-repo/quickstart-image:run5-v1-fat-forever
+        ports:
+          - name: http
+            containerPort: 5000
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/bash", "-c", "python /app/poller_forever.py & disown; disown -a"]
